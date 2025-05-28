@@ -1,3 +1,7 @@
+'''
+This program runs in approximately 1+ minute for the large test case.
+'''
+
 from collections import defaultdict, Counter
 
 def find_anagram(word, anagram_map):
