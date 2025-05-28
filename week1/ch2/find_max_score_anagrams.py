@@ -3,18 +3,20 @@ from collections import defaultdict, Counter
 def find_anagram(word, anagram_map):
     sorted_word = ''.join(sorted(word.strip()))
     letter_dict = Counter(sorted_word)
-
-    # found_anagrams = []
     max_score = 0
     max_score_word = ''
     # print(anagram_map)
+
+
     for dict_letters, word_list in anagram_map:
+        # check if the letters in the sorted word can be formed with the letters in the dictionary word
         if all(dict_letters[char] <= letter_dict.get(char, 0) for char in dict_letters):
-                for candidate in word_list:
-                    cur_score = cal_score(candidate)
-                    if cur_score > max_score:
-                        max_score = cur_score
-                        max_score_word = candidate
+            # see if the candidate word has the maximum score
+            for candidate in word_list:
+                cur_score = cal_score(candidate)
+                if cur_score > max_score:
+                    max_score = cur_score
+                    max_score_word = candidate
 
     return max_score_word
 
@@ -57,6 +59,7 @@ def main():
 
     anagram_map = sorted(anagram_map.items(), key=lambda x: x[0])
 
+    # make a letter dictionary for each sorted word
     for i in range(len(anagram_map)):
         sorted_word, word_list = anagram_map[i]
         letter_dict = {}
@@ -80,6 +83,7 @@ def main():
             max_score_anagrams.append(max_score_anagram)
             # print(find_anagram(word, anagram_map))
 
+    # write results to the output file
     with open('large_answer.txt', 'w') as output_file:
         for anagram in max_score_anagrams:
             output_file.write(anagram + '\n')
