@@ -5,7 +5,7 @@
 最も良いプログラム：hash_table2.py（再ハッシュと collision対策入りの hash table）<br>
 その他プログラム：hash_table.py（ベーシックな hash table）<br>
 
-* 以下の説明は hash_table4.pyについて書きます。
+* 以下の説明は hash_table2.pyについて書きます。
 1. Delete()関数の実装
     1. マップ内の探す箱（bucket）の住所を算出：
         削除したい単語`key`に対し、ハッシュ値を計算。次にマップの長さ`bucket_size`で modをとる。
