@@ -2,8 +2,8 @@
 ### Author: Mimo Shirasaka
 
 ## Challenge 1
-最も良いプログラム：hash_table4.py（再ハッシュと collision対策入りの hash table）<br>
-その他プログラム：hash_table.py（ベーシックな hash table）, hash_table3.py（再ハッシュ入りの hash table）<br>
+最も良いプログラム：hash_table2.py（再ハッシュと collision対策入りの hash table）<br>
+その他プログラム：hash_table.py（ベーシックな hash table）<br>
 
 * 以下の説明は hash_table4.pyについて書きます。
 1. Delete()関数の実装
