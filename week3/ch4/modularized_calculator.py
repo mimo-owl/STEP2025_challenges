@@ -20,7 +20,6 @@ def read_plus(line, index):
     token = {'type': 'PLUS'}
     return token, index + 1
 
-
 def read_minus(line, index):
     token = {'type': 'MINUS'}
     return token, index + 1
@@ -134,6 +133,7 @@ def tokenize(line):
         tokens.append(token)
     return tokens
 
+
 def calculate_tokens(tokens):
     if tokens[0]['type'] != 'PLUS':
         tokens.insert(0, {'type': 'PLUS'}) # Insert a dummy '+' token
@@ -158,6 +158,7 @@ def evaluate(tokens):
             break
         index = 0
         while index < len(tokens):
+            # () の中を計算する
             tmp_tokens = []
             if tokens[index]['type'] == 'PAREN_END':
                 seen_index = index # ここまでは読んだ、という意味でindexを記録(この計算が終わったら、この続きから見れば良い)
@@ -166,8 +167,9 @@ def evaluate(tokens):
                     tmp_tokens.insert(0, tokens[index])
                     index -= 1
                 # print(f"tmp_tokens = {tmp_tokens}")
-
                 tmp_answer = calculate_tokens(tmp_tokens)
+
+                # 計算ずみの（）内の値に対し、abs, int, float のprefix があればそれを適用する
                 has_prefix = False
                 if tokens[index - 1]['type'] == 'ABS':
                     tmp_answer = abs(tmp_answer)
@@ -179,23 +181,21 @@ def evaluate(tokens):
                     tmp_answer = float(tmp_answer)
                     has_prefix = True
 
-                # renew the tokens list
+                # tokens リストを更新
                 if has_prefix:
                     # Replace 'PAREN_BEGIN' with the calculated value
                     tokens[index - 1]['type'] = 'NUMBER'
                     tokens[index - 1]['number'] = tmp_answer
-
                     # Remove the parentheses part
                     tokens = tokens[:index] + tokens[seen_index + 1:]
                 else:
                     # Replace 'ABS' or 'INT' or 'FLOAT' with the calculated value
                     tokens[index]['type'] = 'NUMBER'
                     tokens[index]['number'] = tmp_answer
-
                     # Remove the parentheses part
                     tokens = tokens[:index + 1] + tokens[seen_index + 1:]
-            index += 1
 
+            index += 1
     # print(f"tokens = {tokens}")
     answer = calculate_tokens(tokens=tokens)
 
