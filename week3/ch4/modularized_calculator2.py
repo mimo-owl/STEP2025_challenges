@@ -52,17 +52,21 @@ def read_float(line, index):
     token = {'type': 'FLOAT'}
     return token, index + 5
 
+def read_round(line, index):
+    token = {'type': 'ROUND'}
+    return token, index + 5
+
 
 def calculate_mul_div(tokens):
     index = 0
     while index < len(tokens):
         if tokens[index]['type'] == 'NUMBER':
-            if index > 0 and tokens[index - 1]['type'] == 'MULTIPLY':
+            if index > 1 and tokens[index - 1]['type'] == 'MULTIPLY':
                 tokens[index - 2]['number'] *= tokens[index]['number']
                 tokens.pop(index)
                 tokens.pop(index - 1)
                 index -= 1
-            elif index > 0 and tokens[index - 1]['type'] == 'DIVIDE':
+            elif index > 1 and tokens[index - 1]['type'] == 'DIVIDE':
                 # Check for divisionn by zero
                 if tokens[index]['number'] == 0:
                     print("Error: Division by zero")
@@ -77,6 +81,7 @@ def calculate_mul_div(tokens):
             index += 1
     return tokens
 
+
 def calculate_add_sub(tokens):
     # print(f'tokens = {tokens}')
     index = 0
@@ -87,8 +92,6 @@ def calculate_add_sub(tokens):
                 answer += tokens[index]['number']
             elif index > 0 and tokens[index - 1]['type'] == 'MINUS':
                 answer -= tokens[index]['number']
-            elif index > 0 and tokens[index - 1]['type'] == 'ABS' or 'INT' or 'FLOAT': # これいらないかも
-                pass
             else:
                 print(f'One before: {tokens[index - 1]}')
                 print(f'Invalid syntax at index {index}: {tokens[index]}')
@@ -127,6 +130,8 @@ def tokenize(line):
             (token, index) = read_int(line, index)
         elif line[index] == 'f' and line[index+2] == 'o' and line[index+4] == 't': # float
             (token, index) = read_float(line, index)
+        elif line[index] == 'r' and line[index+2] == 'u' and line[index+4] == 'd': # round
+            (token, index) = read_round(line, index)
         else:
             print('Invalid character found: ' + line[index])
             exit(1)
@@ -147,13 +152,41 @@ def calculate_tokens(tokens):
 
     return answer
 
+def calculate_abs_int_float(tokens, index, seen_index, tmp_answer):
+    has_prefix = False
+    if tokens[index - 1]['type'] == 'ABS':
+        tmp_answer = abs(tmp_answer)
+        has_prefix = True
+    elif tokens[index - 1]['type'] == 'INT':
+        tmp_answer = int(tmp_answer)
+        has_prefix = True
+    elif tokens[index - 1]['type'] == 'FLOAT':
+        tmp_answer = float(tmp_answer)
+        has_prefix = True
+    elif tokens[index -1]['type'] == 'ROUND':
+        print(f"Round {tmp_answer} before")
+        tmp_answer = round(tmp_answer)
+        print(f"Round {tmp_answer} after")
+        has_prefix = True
+
+    # tokens リストを更新
+    if has_prefix:
+        # Replace 'ABS' or 'INT' or 'FLOAT' with the calculated value
+        tokens[index - 1]['type'] = 'NUMBER'
+        tokens[index - 1]['number'] = tmp_answer
+        # Remove the parentheses part
+        tokens = tokens[:index] + tokens[seen_index + 1:]
+    else:
+        # Replace 'PAREN_BEGIN' with the calculated value
+        tokens[index]['type'] = 'NUMBER'
+        tokens[index]['number'] = tmp_answer
+        # Remove the parentheses part
+        tokens = tokens[:index + 1] + tokens[seen_index + 1:]
+
+    return tokens
 
 
-def evaluate(tokens):
-    answer = 0
-    tokens.insert(0, {'type': 'PLUS'}) # Insert a dummy '+' token
-
-    # l156 ~ l170  で　calculate_parentheses_tokens() などを作る
+def calculate_parentheses_tokens(tokens):
     while True:
         if not any(token['type'] == 'PAREN_BEGIN' for token in tokens) and not any(token['type'] == 'PAREN_END' for token in tokens):
             break
@@ -170,35 +203,19 @@ def evaluate(tokens):
                 # print(f"tmp_tokens = {tmp_tokens}")
                 tmp_answer = calculate_tokens(tmp_tokens)
 
-                # ABS, INT, FLOAT の計算を関数でやる
                 # 計算ずみの（）内の値に対し、abs, int, float のprefix があればそれを適用する
-                has_prefix = False
-                if tokens[index - 1]['type'] == 'ABS':
-                    tmp_answer = abs(tmp_answer)
-                    has_prefix = True
-                elif tokens[index - 1]['type'] == 'INT':
-                    tmp_answer = int(tmp_answer)
-                    has_prefix = True
-                elif tokens[index - 1]['type'] == 'FLOAT':
-                    tmp_answer = float(tmp_answer)
-                    has_prefix = True
+                tokens = calculate_abs_int_float(tokens, index, seen_index, tmp_answer)
+                index = 0
+            else:
+                index += 1
 
-                # tokens リストを更新
-                if has_prefix:
-                    # Replace 'ABS' or 'INT' or 'FLOAT' with the calculated value
-                    tokens[index - 1]['type'] = 'NUMBER'
-                    tokens[index - 1]['number'] = tmp_answer
-                    # Remove the parentheses part
-                    tokens = tokens[:index] + tokens[seen_index + 1:]
-                else:
-                    # Replace 'PAREN_BEGIN' with the calculated value
-                    tokens[index]['type'] = 'NUMBER'
-                    tokens[index]['number'] = tmp_answer
-                    # Remove the parentheses part
-                    tokens = tokens[:index + 1] + tokens[seen_index + 1:]
+    return tokens
 
-            index += 1
-    # print(f"tokens = {tokens}")
+
+def evaluate(tokens):
+    answer = 0
+    tokens.insert(0, {'type': 'PLUS'}) # Insert a dummy '+' token
+    tokens = calculate_parentheses_tokens(tokens)
     answer = calculate_tokens(tokens=tokens)
 
     return answer
@@ -257,8 +274,11 @@ def run_test():
     test("abs(-3)+int(3.5)*float(3)")
     test("3+(abs(-3)+int(3.4)/float(3))*2")
 
-    # start from -
+    # start from
     test("-3")
+
+    # test round
+    test("12+abs(int(round(-1.55)+abs(int(-2.3+4))))")
 
 
     print("==== Test finished! ====\n")
