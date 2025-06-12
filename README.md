@@ -40,5 +40,33 @@ Implement the cache.
 The goal is to implement the data structure yourself without using any existing libraries (e.g., collections.*)
 Use the HashTable you implemented in Homework 1
 
+## Week3:
 
+## Challenge 1
+### 問題<br>
+モジュール化されたプログラムを変更して、「*」「/」に対応しよう<br>
+例： 3.0 + 4 * 2 − 1 / 5<br>
+不正な入力はないと仮定してよい<br>
+細かい仕様は好きに定義してください<br>
 
+## Challenge 2
+## 問題<br>
+書いたプログラムが正しく動いていることを確認するためのテストケースを追加しよう<br>
+できるだけ網羅的に<br>
+
+## Challenge 3
+## 問題<br>
+括弧に対応しよう<br>
+例:  (3.0 + 4 * (2 − 1)) / 5<br>
+テストケースも追加してください<br>
+いろいろな解き方があります（5 種類以上）<br>
+
+## Challenge 4
+## 問題<br>
+abs(), int(), round() に対応しよう<br>
+abs(-2.2) => 2.2 （絶対値）<br>
+int(1.55) => 1（小数を切捨てる）<br>
+round(1.55) => 2（四捨五入）<br>
+
+テストケースも追加してください <br>
+例: 12 + abs(int(round(-1.55) + abs(int(-2.3 + 4)))) <br>
