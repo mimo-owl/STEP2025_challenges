@@ -70,3 +70,12 @@ round(1.55) => 2（四捨五入）<br>
 
 テストケースも追加してください <br>
 例: 12 + abs(int(round(-1.55) + abs(int(-2.3 + 4)))) <br>
+
+# Week4:
+
+## Challenge 1
+Calculate the distance from one page to another page. Write your code in find_shortest_path().
+
+## Challenge 2
+aCalculate the pageranks and print the most important 10 pages. Write your code in find_most_popular_pages().
+
