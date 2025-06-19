@@ -116,7 +116,7 @@ class Wikipedia:
                 return
 
             for child in self.links[node]:
-                if not child in visited:
+                if not child in parent.keys():
                     parent[child] = node
                     queue.append(child)
                     visited[child] = True
