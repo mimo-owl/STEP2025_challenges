@@ -118,7 +118,7 @@ class Wikipedia:
                 return
 
             for child in self.links[node]:
-                if not child in parent.keys(): # visited 使わずとも、parent.keys() で調べられる
+                if not child in visited:
                     # 親ノードを記憶しておく
                     parent[child] = node
                     queue.append(child)
@@ -146,7 +146,6 @@ class Wikipedia:
             # step2: 各ノードのページランクを隣接ノードに均等に振り分ける
             # step3: 各ノードのページランクを、受け取ったページランクの合計値に更新する
             new_ranks = defaultdict(float)
-            # print(f"links.items(): {self.links.items()}")
             for node, neighbors in self.links.items():
                 # 隣接ノードがある場合
                 if neighbors:
@@ -167,8 +166,6 @@ class Wikipedia:
 
             for node in self.links:
                 total_diff += (new_ranks[node] - ranks[node]) ** 2
-                print(f"new_ranks: {new_ranks[node]}, ranks: {ranks[node]}")
-                print(f"total_diff: {total_diff}")
             ranks = new_ranks
 
             # rankの合計値が一定になっていることを確認
@@ -193,7 +190,41 @@ class Wikipedia:
         #------------------------#
         # Write your code here!  #
         #------------------------#
-        pass
+        print("find_longest_path")
+        start_id = self.convert_word2id(start)
+        goal_id = self.convert_word2id(goal)
+        print(start_id, goal_id)
+        queue = deque()
+        visited = {}
+        parent = {}
+        queue.append(start_id)
+        visited[start_id] = True
+
+        while queue:
+            # BFS
+            node = queue.popleft()
+            visited[node] = True
+            if node == goal_id:
+                path = self.convert_id2word(node)
+                # 最短経路でゴールに辿りついたら、ゴールから親を辿り最短経路を求める
+                while node != start_id:
+                    parent_of_node = parent[node]
+                    parent_word = self.convert_id2word(parent_of_node)
+                    # print(f"parent_word: {parent_word}")
+                    # print(f"path: {path}")
+                    path = str(parent_word + "->" + path)
+                    node = parent_of_node
+                print(f"見つかった最短経路：{path}")
+                return
+
+            for child in self.links[node]:
+                if not child in visited:
+                    # 親ノードを記憶しておく
+                    parent[child] = node
+                    queue.append(child)
+                    visited[child] = True
+
+        print("経路が見つかりませんでした。")
 
 
     # Helper function for Homework #3:
