@@ -54,33 +54,28 @@ def solve_n(L, K):
     #-----------------------#
 
     # [1, 2, 3], K = 2
+    '''
+    方針: 部分和がK以上になるよう制約をかけて、index0から見た時の(最大和ー最小和)が部分最大和 という考え方で maxSumを更新していく
+    この解き方の計算量: 時間計算量O(N), 空間計算量O(N)
+    '''
 
-    l = 0 # 1
-    r = K # 3
-    curSum = sum(L[l:r]) # curSumを初期化。ここでは index r の値は和に含まれない。あとで足すので。 # sum of [1, 2] = 3
-    maxSum = curSum # 3
-    # print(f"curSum = {curSum}, maxSum = {maxSum}, l = {l}, r = {r-1}")
+    maxSum = sum(L[0:K]) # 初期値
+    minSum = 0 # 初期値 (メモ：0にした理由は、初めてl70を通る時に "-0" にして何も引かないようにするため)
+    sums = [] # 0~index (ただしindex = 0 ~ N-1) までの和を格納するためのリスト　
 
-    # 左側を動かしていく
-    while l < N - K + 1: # 3 - 2 + 1 = 2
-        # 処理：右側が範囲外になるまで動かして和を見ていく
+    # sumsに値を記録していく
+    tmpSum = 0
+    for val in L:
+        tmpSum += val
+        sums.append(tmpSum)
 
-        # 右側が範囲外になった場合
-        if r >= N: # r = 3
-            l += 1 # 左側を更新
-            r = min(N - 1, l + K - 1) # 右側は、更新された左側から測って長さKの位置に更新
-
-            if l < N - K + 1:
-                curSum = sum(L[l:r]) # curSumを初期化。l60と同様の理由で、rの値は和に含まれない。
-            continue
-
-        # 右側が範囲内の場合
-        curSum += L[r] # 5
-        maxSum = max(maxSum, curSum) # 5
-        # print(f"curSum = {curSum}, maxSum = {maxSum}, l = {l}, r = {r}")
-        r += 1 # 3 # 右側を１つ右に進める
+    # maxSumを更新していく
+    for i in range(K-1, N):
+        maxSum = max(maxSum, sums[i] - minSum)
+        minSum = min(minSum, sums[i - K + 1])
 
     return maxSum
+
 
 
 # For a given L and K, run the three algorithms (O(N^3), O(N^2) and O(N))
